@@ -47,22 +47,28 @@ function App() {
 
           </div>
 
+
           {/* Portfolio */}
-          
-          <section id="portfolio" className="mb-8">
-  <PortfolioHeader />
-</section>
+          <section id="portfolio" className="mb-8 scroll-mt-6">
+
+            <PortfolioHeader />
+
+          </section>
+
 
           {/* Stats */}
-          
-<section id="trades" className="mb-8">
-  <StatsRow />
-</section>
-          {/* Charts */}
-          <section id="risk-analysis" className="mb-8">
-  {/* charts */}
-</section>
-          <section id="risk-analysis" className="mb-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <section className="mb-8">
+
+            <StatsRow />
+
+          </section>
+
+
+          {/* Risk Analysis Charts */}
+          <section
+            id="risk-analysis"
+            className="mb-8 scroll-mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2"
+          >
 
             <AllocationChart />
 
@@ -70,29 +76,49 @@ function App() {
 
           </section>
 
+
           {/* Risk + Trade List */}
           <section className="mb-8 grid grid-cols-1 gap-6 xl:grid-cols-3">
 
+            {/* Risk Breakdown */}
             <div className="xl:col-span-1">
+
               <RiskBreakdownChart />
+
             </div>
 
-            <div className="xl:col-span-2">
+
+            {/* Trade List */}
+            <div
+              id="trades"
+              className="scroll-mt-6 xl:col-span-2"
+            >
+
               <TradeList />
+
             </div>
 
           </section>
+
 
           {/* Audit Log */}
-          <section id="audit-logs">
+          <section
+            id="audit-logs"
+            className="scroll-mt-6"
+          >
+
             <AuditLogTable />
+
           </section>
+
 
           {/* Footer */}
           <footer className="mt-10 border-t border-gray-800 pt-5 text-center">
+
             <p className="text-xs text-gray-600">
               TradeGuard AI • AI-powered trade monitoring & audit system
             </p>
+
           </footer>
 
         </main>
