@@ -1,208 +1,271 @@
-import { X, Bot, ShieldCheck, Clock3 } from "lucide-react";
+import { useEffect, useState } from "react";
+
+const API_URL = "https://tradeaudit-backend-h3z4.onrender.com";
 
 function TradeDetailPanel({ trade, onClose }) {
+  const [explanation, setExplanation] = useState("");
+  const [riskScore, setRiskScore] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!trade) {
+      setExplanation("");
+      setRiskScore("");
+      return;
+    }
+
+    const getAIExplanation = async () => {
+      setLoading(true);
+      setError(false);
+      setExplanation("");
+      setRiskScore("");
+
+      try {
+        const response = await fetch(`${API_URL}/api/explain`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            symbol: trade.symbol,
+            side: String(trade.side || "").toLowerCase(),
+            qty: Number(trade.qty || 0),
+            price: Number(trade.price || 0),
+            total: Number(
+              trade.total ||
+                Number(trade.qty || 0) * Number(trade.price || 0)
+            ),
+            status: String(trade.status || "").toLowerCase(),
+            portfolioValue: Number(trade.portfolioValue || 0),
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("AI explanation request failed");
+        }
+
+        const data = await response.json();
+
+        setExplanation(
+          data.explanation || "No AI explanation available."
+        );
+
+        setRiskScore(
+          data.riskScore || "UNKNOWN"
+        );
+      } catch (err) {
+        console.error("AI Explain Error:", err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getAIExplanation();
+  }, [trade]);
+
+  // No trade selected
   if (!trade) {
     return (
       <div className="rounded-xl border border-gray-800 bg-[#161B22] p-6">
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-blue-500/10 p-3">
-            <Bot className="text-blue-400" size={22} />
-          </div>
+        <h2 className="text-lg font-semibold text-white">
+          Trade Details
+        </h2>
 
-          <div>
-            <h2 className="text-lg font-semibold text-white">
-              Trade Details
-            </h2>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Select a trade to view AI analysis
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 rounded-lg border border-dashed border-gray-800 p-6 text-center">
-          <p className="text-sm text-gray-500">
-            Click any trade from the table to see its details.
-          </p>
-        </div>
+        <p className="mt-3 text-sm text-gray-500">
+          Click a trade to view its details and AI explanation.
+        </p>
       </div>
     );
   }
 
-  const riskClass =
-    trade.risk === "LOW"
-      ? "bg-green-500/10 text-green-400 border-green-500/20"
-      : trade.risk === "MEDIUM"
-      ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-      : "bg-red-500/10 text-red-400 border-red-500/20";
-
-  const statusClass =
-    trade.status === "FILLED"
+  const riskColor =
+    riskScore === "LOW"
       ? "bg-green-500/10 text-green-400"
-      : trade.status === "BLOCKED"
+      : riskScore === "MEDIUM"
+      ? "bg-yellow-500/10 text-yellow-400"
+      : riskScore === "HIGH"
       ? "bg-red-500/10 text-red-400"
-      : "bg-yellow-500/10 text-yellow-400";
+      : "bg-gray-500/10 text-gray-400";
 
   return (
     <div className="rounded-xl border border-gray-800 bg-[#161B22] p-6">
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-center justify-between">
 
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-blue-500/10 p-3">
-            <Bot className="text-blue-400" size={22} />
-          </div>
+        <div>
+          <h2 className="text-lg font-semibold text-white">
+            Trade Details
+          </h2>
 
-          <div>
-            <h2 className="text-lg font-semibold text-white">
-              Trade Details
-            </h2>
-
-            <p className="mt-1 text-xs text-gray-500">
-              AI-powered trade analysis
-            </p>
-          </div>
+          <p className="mt-1 text-sm text-gray-500">
+            AI-powered trade analysis
+          </p>
         </div>
 
         <button
           onClick={onClose}
-          className="rounded-lg p-2 text-gray-500 transition hover:bg-[#1C2128] hover:text-white"
-          aria-label="Close trade details"
+          className="rounded-lg px-2 py-1 text-gray-500 transition hover:bg-gray-800 hover:text-white"
         >
-          <X size={20} />
+          ✕
         </button>
 
       </div>
 
-
       {/* Symbol */}
-      <div className="mt-6 rounded-xl border border-gray-800 bg-[#0D1117] p-5">
+      <div className="mt-6">
 
-        <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500">
+          Symbol
+        </p>
 
-          <div>
-            <p className="text-xs uppercase tracking-wider text-gray-500">
-              Symbol
-            </p>
-
-            <h3 className="mt-1 text-3xl font-bold text-white">
-              {trade.symbol}
-            </h3>
-          </div>
-
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              trade.side === "BUY"
-                ? "bg-green-500/10 text-green-400"
-                : "bg-red-500/10 text-red-400"
-            }`}
-          >
-            {trade.side}
-          </span>
-
-        </div>
+        <p className="mt-1 text-3xl font-bold text-white">
+          {trade.symbol}
+        </p>
 
       </div>
 
+      {/* Trade Details */}
+      <div className="mt-6 grid grid-cols-2 gap-5">
 
-      {/* Trade Information */}
-      <div className="mt-5 grid grid-cols-2 gap-4">
+        {/* Action */}
+        <div>
+          <p className="text-xs text-gray-500">
+            Action
+          </p>
 
-        <div className="rounded-lg border border-gray-800 p-4">
+          <p
+            className={`mt-1 font-semibold ${
+              String(trade.side).toUpperCase() === "BUY"
+                ? "text-green-400"
+                : "text-red-400"
+            }`}
+          >
+            {String(trade.side || "N/A").toUpperCase()}
+          </p>
+        </div>
+
+        {/* Amount */}
+        <div>
+          <p className="text-xs text-gray-500">
+            Amount
+          </p>
+
+          <p className="mt-1 font-semibold text-white">
+            $
+            {Number(
+              trade.total || 0
+            ).toLocaleString()}
+          </p>
+        </div>
+
+        {/* Quantity */}
+        <div>
           <p className="text-xs text-gray-500">
             Quantity
           </p>
 
           <p className="mt-1 font-semibold text-white">
-            {trade.qty}
+            {trade.qty || 0}
           </p>
         </div>
 
-
-        <div className="rounded-lg border border-gray-800 p-4">
-          <p className="text-xs text-gray-500">
-            Price
-          </p>
-
-          <p className="mt-1 font-semibold text-white">
-            ${trade.price.toLocaleString()}
-          </p>
-        </div>
-
-
-        <div className="rounded-lg border border-gray-800 p-4">
-          <p className="text-xs text-gray-500">
-            Total Amount
-          </p>
-
-          <p className="mt-1 font-semibold text-white">
-            ${trade.total.toLocaleString()}
-          </p>
-        </div>
-
-
-        <div className="rounded-lg border border-gray-800 p-4">
+        {/* Status */}
+        <div>
           <p className="text-xs text-gray-500">
             Status
           </p>
 
-          <span
-            className={`mt-1 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass}`}
+          <p
+            className={`mt-1 font-semibold ${
+              String(trade.status).toUpperCase() === "FILLED"
+                ? "text-green-400"
+                : String(trade.status).toUpperCase() === "BLOCKED"
+                ? "text-red-400"
+                : "text-yellow-400"
+            }`}
           >
-            {trade.status}
-          </span>
-        </div>
-
-      </div>
-
-
-      {/* Risk */}
-      <div className="mt-5">
-
-        <div className="mb-2 flex items-center gap-2">
-          <ShieldCheck size={17} className="text-gray-400" />
-
-          <p className="text-sm font-medium text-gray-300">
-            Risk Level
+            {String(
+              trade.status || "N/A"
+            ).toUpperCase()}
           </p>
         </div>
 
-        <div
-          className={`rounded-lg border px-4 py-3 text-sm font-semibold ${riskClass}`}
-        >
-          {trade.risk} RISK
-        </div>
-
       </div>
 
+      {/* AI Analysis */}
+      <div className="mt-6 rounded-xl border border-gray-800 bg-[#0D1117] p-5">
 
-      {/* AI Explanation */}
-      <div className="mt-5 rounded-xl border border-blue-500/20 bg-blue-500/5 p-5">
-
-        <div className="flex items-center gap-2">
-          <Bot size={18} className="text-blue-400" />
+        <div className="flex items-center justify-between gap-3">
 
           <p className="text-sm font-semibold text-white">
-            AI Explanation
+            🤖 AI Explanation
           </p>
+
+          {/* Risk Badge */}
+          {riskScore && !loading && (
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${riskColor}`}
+            >
+              {riskScore} RISK
+            </span>
+          )}
+
         </div>
 
-        <p className="mt-3 text-sm leading-6 text-gray-400">
-          {trade.explanation}
-        </p>
+        {/* Loading */}
+        {loading && (
+          <div className="mt-4">
+
+            <div className="flex items-center gap-3">
+
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-600 border-t-blue-400" />
+
+              <p className="text-sm text-gray-500">
+                AI is analyzing this trade...
+              </p>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* Error */}
+        {error && !loading && (
+          <div className="mt-4">
+
+            <p className="text-sm text-red-400">
+              Could not get AI explanation from the API.
+            </p>
+
+            <p className="mt-1 text-xs text-gray-600">
+              Please check the backend connection.
+            </p>
+
+          </div>
+        )}
+
+        {/* Explanation */}
+        {!loading && !error && explanation && (
+          <p className="mt-4 text-sm leading-6 text-gray-400">
+            {explanation}
+          </p>
+        )}
 
       </div>
 
-
       {/* Timestamp */}
-      <div className="mt-5 flex items-center gap-2 text-xs text-gray-500">
+      <div className="mt-5">
 
-        <Clock3 size={15} />
+        <p className="text-xs text-gray-500">
+          Trade Time
+        </p>
 
-        <span>
-          Trade executed at {trade.timestamp}
-        </span>
+        <p className="mt-1 text-sm text-gray-300">
+          {trade.timestamp || trade.created_at || "N/A"}
+        </p>
 
       </div>
 

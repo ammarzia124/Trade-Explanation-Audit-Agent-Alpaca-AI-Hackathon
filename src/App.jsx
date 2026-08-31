@@ -7,6 +7,7 @@ import AllocationChart from "./components/AllocationChart";
 import TradeVolumeChart from "./components/TradeVolumeChart";
 import RiskBreakdownChart from "./components/RiskBreakdownChart";
 import AuditLogTable from "./components/AuditLogTable";
+import AIChat from "./components/AIChat";
 
 function App() {
   return (
@@ -102,16 +103,14 @@ function App() {
 
 
           {/* Audit Log */}
-          <section
-            id="audit-logs"
-            className="scroll-mt-6"
-          >
 
+          <section id="audit-logs">
             <AuditLogTable />
-
           </section>
 
+          <AIChat />
 
+          <footer></footer>
           {/* Footer */}
           <footer className="mt-10 border-t border-gray-800 pt-5 text-center">
 
