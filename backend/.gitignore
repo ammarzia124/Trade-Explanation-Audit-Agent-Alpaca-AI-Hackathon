@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+trades.db
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+coverage/
+.nyc_output/
+*.log
+.DS_Store
