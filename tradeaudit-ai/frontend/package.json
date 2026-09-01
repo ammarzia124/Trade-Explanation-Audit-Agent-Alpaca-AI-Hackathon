@@ -1,0 +1,73 @@
+{
+  "name": "tradeaudit-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint . --ext .jsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    // UI library — renders the component tree
+
+    "react-dom": "^18.2.0",
+    // React DOM renderer — mounts React to the browser DOM
+
+    "react-router-dom": "^6.21.0",
+    // Client-side routing — navigates between pages without full reload
+
+    "axios": "^1.6.2",
+    // HTTP client — calls the backend REST API
+
+    "recharts": "^2.10.3",
+    // Charting library — renders risk distribution and trade volume charts
+
+    "lucide-react": "^0.294.0",
+    // Icon library — clean SVG icons for the UI
+
+    "date-fns": "^3.0.6",
+    // Date utilities — formats timestamps from trade data
+
+    "clsx": "^2.0.0",
+    // Conditional className utility — merges Tailwind classes safely
+
+    "react-hot-toast": "^2.4.1",
+    // Toast notifications — shows success/error messages
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    // Vite plugin for React — enables JSX transform and fast refresh
+
+    "vite": "^5.0.8",
+    // Build tool — dev server, bundling, and HMR
+
+    "tailwindcss": "^3.4.0",
+    // Utility-first CSS framework — rapid UI styling
+
+    "postcss": "^8.4.32",
+    // CSS transformer — required by Tailwind to process CSS
+
+    "autoprefixer": "^10.4.16",
+    // Adds vendor prefixes — ensures cross-browser CSS compatibility
+
+    "vitest": "^1.1.0",
+    // Test runner — Vite-native testing framework
+
+    "@testing-library/react": "^14.1.2",
+    // React testing utilities — renders components in tests
+
+    "@testing-library/jest-dom": "^6.1.4",
+    // Custom Jest matchers — toBeInTheDocument, toHaveClass, etc.
+
+    "eslint": "^8.55.0",
+    // Linter — catches code quality issues
+
+    "eslint-plugin-react": "^7.33.2",
+    // React-specific lint rules
+  }
+}
