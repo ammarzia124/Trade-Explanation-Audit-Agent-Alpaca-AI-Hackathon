@@ -7,7 +7,7 @@ import AllocationChart from "./components/AllocationChart";
 import TradeVolumeChart from "./components/TradeVolumeChart";
 import RiskBreakdownChart from "./components/RiskBreakdownChart";
 import AuditLogTable from "./components/AuditLogTable";
-import AIChat from "./components/AIChat";
+import ChatPanel from "./components/Chatbot/ChatPanel";
 
 function App() {
   return (
@@ -108,7 +108,7 @@ function App() {
             <AuditLogTable />
           </section>
 
-          <AIChat />
+          <ChatPanel />
 
           <footer></footer>
           {/* Footer */}
