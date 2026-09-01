@@ -9,7 +9,7 @@ import { getMockResponse } from '../data/mockData';
 const USE_MOCK_DATA = false;
 
 // Backend API URL — set VITE_API_BASE_URL in Vercel env vars to your Render backend URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tradeaudit-backend.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 export const sendChatMessage = async (question) => {
   console.log('🔵 [SERVICE] sendChatMessage called with:', question);
