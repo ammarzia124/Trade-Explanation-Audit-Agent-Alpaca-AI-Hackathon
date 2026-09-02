@@ -1,8 +1,8 @@
-# TradeAudit AI - Ayesha's Chatbot
+# TradeAudit AI - Trading Dashboard
 
-> AI Chatbot for Alpaca Hackathon 2026
+> AI Trade Explanation & Audit Agent - Alpaca Hackathon 2026
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Install dependencies
@@ -12,3 +12,21 @@ npm install
 npm run dev
 
 # Open http://localhost:3000
+```
+
+## Tech Stack
+
+- **React 19** - UI framework
+- **Vite 8** - Build tool with HMR
+- **Tailwind CSS 4** - Utility-first CSS
+- **Recharts** - Charting library
+- **Framer Motion** - Animations
+- **Lucide React** - Icons
+
+## Features
+
+- Real-time trading dashboard
+- AI-powered trade explanations
+- Risk analysis charts
+- Portfolio monitoring
+- Chat interface for trade queries

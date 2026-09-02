@@ -1,0 +1,53 @@
+name: tradeaudit_mobile
+description: TradeAudit AI - Mobile trading analysis companion
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI
+  google_fonts: ^6.1.0
+  # Google Fonts — loads Inter font family for consistent typography
+
+  fl_chart: ^0.65.0
+  # Charts — renders risk distribution pie charts and trade graphs
+
+  flutter_animate: ^4.3.0
+  # Animations — smooth page transitions and card animations
+
+  # State Management
+  provider: ^6.1.1
+  # State management — provides trade data to the widget tree
+
+  # Networking
+  http: ^1.1.0
+  # HTTP client — calls the backend REST API
+
+  web_socket_channel: ^2.4.0
+  # WebSocket client — receives live trade updates from backend
+
+  # Utilities
+  intl: ^0.18.1
+  # Internationalization — formats dates and currencies
+
+  shared_preferences: ^2.2.2
+  # Local storage — saves API URL and user preferences
+
+  # Icons
+  cupertino_icons: ^1.0.6
+  # iOS-style icons
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.1
+  # Lint rules — enforces Flutter best practices
+
+flutter:
+  uses-material-design: true
