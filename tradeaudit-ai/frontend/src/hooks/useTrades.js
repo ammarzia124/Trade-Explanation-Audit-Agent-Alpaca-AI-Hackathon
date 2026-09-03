@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import api from '../services/api';
+import { getTrades } from '../lib/alpacaClient';
 
 export function useTradesList(params = {}) {
   const [trades, setTrades] = useState([]);
@@ -9,15 +9,15 @@ export function useTradesList(params = {}) {
   const fetchTrades = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/trades', { params });
-      setTrades(data.trades);
+      const data = await getTrades(params);
+      setTrades(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to fetch trades');
+      setError(err.message || 'Failed to fetch trades');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [JSON.stringify(params)]);
 
   useEffect(() => { fetchTrades(); }, [fetchTrades]);
 

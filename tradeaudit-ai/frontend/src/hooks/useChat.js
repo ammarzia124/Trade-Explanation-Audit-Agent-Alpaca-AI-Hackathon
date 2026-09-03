@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import api from '../services/api';
+import { sendChat } from '../lib/alpacaClient';
 
 export function useChat() {
   const [messages, setMessages] = useState([]);
@@ -10,11 +10,11 @@ export function useChat() {
     setLoading(true);
 
     try {
-      const { data } = await api.post('/chat', { message });
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      const data = await sendChat(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
       return data;
     } catch (err) {
-      throw new Error(err.response?.data?.error || 'Chat failed');
+      throw new Error(err.message || 'Chat failed');
     } finally {
       setLoading(false);
     }

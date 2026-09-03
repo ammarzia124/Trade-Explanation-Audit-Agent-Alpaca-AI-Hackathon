@@ -1,7 +1,20 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import api from '../services/api';
+import { getTrades, getAuditLogs, analyzeTrade, sendChat as apiSendChat, createAuditLog as apiCreateAuditLog } from '../lib/alpacaClient';
 
 const TradeContext = createContext();
+
+function transformTrade(t) {
+  const riskCategory = String(t.risk_score || 'MEDIUM').toLowerCase();
+  return {
+    ...t,
+    filled_avg_price: t.filled_avg_price || t.price,
+    risk_category: riskCategory,
+    created_at: t.created_at || t.timestamp,
+    order_type: t.order_type || 'market',
+    time_in_force: t.time_in_force || 'day',
+    filled_at: t.filled_at || t.timestamp,
+  };
+}
 
 export function useTrades() {
   const context = useContext(TradeContext);
@@ -12,7 +25,6 @@ export function useTrades() {
 export function TradeProvider({ children }) {
   const [trades, setTrades] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
-  const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [wsConnected, setWsConnected] = useState(false);
@@ -21,10 +33,10 @@ export function TradeProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get('/trades', { params });
-      setTrades(data.trades);
+      const raw = await getTrades(params);
+      setTrades(Array.isArray(raw) ? raw.map(transformTrade) : []);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to fetch trades');
+      setError(err.message || 'Failed to fetch trades');
     } finally {
       setLoading(false);
     }
@@ -32,53 +44,47 @@ export function TradeProvider({ children }) {
 
   const fetchAuditLogs = useCallback(async (params = {}) => {
     try {
-      const { data } = await api.get('/audit', { params });
-      setAuditLogs(data.logs);
+      const logs = await getAuditLogs(params);
+      setAuditLogs(logs);
     } catch (err) {
       console.error('Failed to fetch audit logs:', err);
     }
   }, []);
 
-  const fetchAccount = useCallback(async () => {
-    try {
-      const { data } = await api.get('/alpaca/account');
-      setAccount(data.account);
-    } catch (err) {
-      console.error('Failed to fetch account:', err);
-    }
-  }, []);
-
-  const analyzeTrade = useCallback(async (tradeId) => {
-    try {
-      const { data } = await api.post(`/trades/${tradeId}/analyze`);
-      setTrades(prev => prev.map(t => t.id === tradeId ? data.trade : t));
-      return data.analysis;
-    } catch (err) {
-      throw new Error(err.response?.data?.error || 'Analysis failed');
-    }
+  const handleAnalyzeTrade = useCallback(async (tradeId) => {
+    const result = await analyzeTrade(tradeId);
+    setTrades((prev) =>
+      prev.map((t) => (t.id === tradeId ? transformTrade(result.trade) : t))
+    );
+    return result.analysis;
   }, []);
 
   const sendChat = useCallback(async (message) => {
-    const { data } = await api.post('/chat', { message });
-    return data;
+    return apiSendChat(message);
   }, []);
 
   const createAuditLog = useCallback(async (logData) => {
-    const { data } = await api.post('/audit', logData);
-    setAuditLogs(prev => [data.log, ...prev]);
-    return data.log;
+    const log = await apiCreateAuditLog(logData);
+    setAuditLogs((prev) => [log, ...prev]);
+    return log;
   }, []);
 
   useEffect(() => {
     fetchTrades();
-    fetchAccount();
-  }, [fetchTrades, fetchAccount]);
+  }, [fetchTrades]);
 
   const value = {
-    trades, auditLogs, account, loading, error, wsConnected,
+    trades,
+    auditLogs,
+    loading,
+    error,
+    wsConnected,
     setWsConnected,
-    fetchTrades, fetchAuditLogs, fetchAccount,
-    analyzeTrade, sendChat, createAuditLog,
+    fetchTrades,
+    fetchAuditLogs,
+    analyzeTrade: handleAnalyzeTrade,
+    sendChat,
+    createAuditLog,
   };
 
   return <TradeContext.Provider value={value}>{children}</TradeContext.Provider>;

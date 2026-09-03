@@ -11,20 +11,33 @@ export default class ErrorBoundary extends Component {
     return { hasError: true, error };
   }
 
+  componentDidCatch(error, errorInfo) {
+    console.error('[ErrorBoundary]', error, errorInfo);
+  }
+
+  handleRetry = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
   render() {
     if (this.state.hasError) {
       return (
-        <div className="card text-center py-12">
-          <AlertTriangle size={48} className="text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Something went wrong</h3>
-          <p className="text-gray-500 mb-4">{this.state.error?.message}</p>
-          <button
-            onClick={() => this.setState({ hasError: false })}
-            className="btn-primary inline-flex items-center gap-2"
-          >
-            <RefreshCw size={16} />
-            Try Again
-          </button>
+        <div className="flex min-h-[400px] items-center justify-center p-8">
+          <div className="card max-w-md w-full text-center">
+            <div className="flex justify-center mb-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-danger-muted">
+                <AlertTriangle size={32} className="text-danger" />
+              </div>
+            </div>
+            <h2 className="section-title mb-2">Something went wrong</h2>
+            <p className="text-body text-text-secondary mb-6">
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </p>
+            <button onClick={this.handleRetry} className="btn-primary">
+              <RefreshCw size={16} />
+              Try Again
+            </button>
+          </div>
         </div>
       );
     }
